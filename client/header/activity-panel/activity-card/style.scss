@@ -101,6 +101,14 @@
 
 .woocommerce-activity-card__body {
 	grid-area: body;
+
+	& > p:first-child {
+		margin-top: 0;
+	}
+
+	& > p:last-child {
+		margin-bottom: 0;
+	}
 }
 
 .woocommerce-activity-card__actions {
@@ -286,4 +294,8 @@
 			height: 38px;
 		}
 	}
+}
+
+.woocommerce-empty-review-activity-card {
+	grid-template-columns: 72px 1fr;
 }
