@@ -41,8 +41,20 @@ class WC_Admin_REST_Reports_Import_Controller extends WC_Admin_REST_Reports_Cont
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'import_items' ),
-					'permission_callback' => array( $this, 'import_items_permissions_check' ),
+					'permission_callback' => array( $this, 'import_permissions_check' ),
 					'args'                => $this->get_import_collection_params(),
+				),
+				'schema' => array( $this, 'get_import_public_schema' ),
+			)
+		);
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/delete',
+			array(
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'delete_imported_items' ),
+					'permission_callback' => array( $this, 'import_permissions_check' ),
 				),
 				'schema' => array( $this, 'get_import_public_schema' ),
 			)
@@ -55,7 +67,7 @@ class WC_Admin_REST_Reports_Import_Controller extends WC_Admin_REST_Reports_Cont
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function import_items_permissions_check( $request ) {
+	public function import_permissions_check( $request ) {
 		if ( ! wc_rest_check_manager_permissions( 'settings', 'edit' ) ) {
 			return new WP_Error( 'woocommerce_rest_cannot_edit', __( 'Sorry, you cannot edit this resource.', 'woocommerce-admin' ), array( 'status' => rest_authorization_required_code() ) );
 		}
@@ -177,5 +189,32 @@ class WC_Admin_REST_Reports_Import_Controller extends WC_Admin_REST_Reports_Cont
 		);
 
 		return $this->add_additional_fields_schema( $schema );
+	}
+
+	/**
+	 * Delete all imported items.
+	 *
+	 * @param  WP_REST_Request $request Request data.
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function delete_imported_items( $request ) {
+		$delete = WC_Admin_Reports_Sync::delete_report_data();
+
+		if ( is_wp_error( $delete ) ) {
+			$result = array(
+				'status'  => 'error',
+				'message' => $delete->get_error_message(),
+			);
+		} else {
+			$result = array(
+				'status'  => 'success',
+				'message' => $delete,
+			);
+		}
+
+		$response = $this->prepare_item_for_response( $result, $request );
+		$data     = $this->prepare_response_for_collection( $response );
+
+		return rest_ensure_response( $data );
 	}
 }
