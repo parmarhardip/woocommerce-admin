@@ -26,6 +26,7 @@ class WC_Admin_Reports_Orders_Data_Store extends WC_Admin_Reports_Data_Store imp
 	 */
 	protected $column_types = array(
 		'order_id'       => 'intval',
+		'parent_id'      => 'intval',
 		'date_created'   => 'strval',
 		'status'         => 'strval',
 		'customer_id'    => 'intval',
@@ -42,6 +43,7 @@ class WC_Admin_Reports_Orders_Data_Store extends WC_Admin_Reports_Data_Store imp
 	 */
 	protected $report_columns = array(
 		'order_id'       => 'order_id',
+		'parent_id'      => 'parent_id',
 		'date_created'   => 'date_created',
 		'status'         => 'REPLACE(status, "wc-", "") as status',
 		'customer_id'    => 'customer_id',
